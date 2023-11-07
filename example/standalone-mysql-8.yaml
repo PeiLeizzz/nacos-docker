@@ -2,20 +2,20 @@ version: "3.8"
 services:
   nacos:
     image: nacos/nacos-server:${NACOS_VERSION}
-    container_name: nacos-standalone-mysql
+    container_name: niuktok-nacos
     env_file:
       - ../env/nacos-standlone-mysql.env
     volumes:
       - ${NACOS_VOLUME}/standalone-logs/:/home/nacos/logs
     ports:
-      - "8848:8848"
-      - "9848:9848"
+      - "18848:8848"
+      - "19848:9848"
     depends_on:
       mysql:
         condition: service_healthy
     restart: always
   mysql:
-    container_name: mysql-for-nacos
+    container_name: niuktok-nacos-mysql
     build:
       context: .
       dockerfile: ./image/mysql/8/Dockerfile
@@ -25,6 +25,9 @@ services:
       - ${NACOS_VOLUME}/mysql:/var/lib/mysql
     ports:
       - "${MYSQL_HOST_PORT}:3306"
+    # docker安全验证
+    security_opt:
+      - seccomp:unconfined
     healthcheck:
       test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
       interval: 5s
